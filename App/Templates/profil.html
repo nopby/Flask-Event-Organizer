@@ -1,0 +1,115 @@
+{% extends 'base.html' %} 
+{% block Title %}Profile{% endblock %} 
+
+{% block Logged_Content %}
+    <div class="d-flex flex-column" id="content-wrapper">
+            <div class="container-fluid bg-secondary">
+                <div class="row mb-3">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col">
+                                <div class="card shadow mb-3">
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 font-weight-bold">Pengaturan Profil</p>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if flag %}
+                                        {% with messages = get_flashed_messages(with_categories=true) %} 
+                                        {% if messages %} 
+                                            {% for category, message in messages %}
+                                                {% if category == 'error' %}
+                                            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% else %}
+                                            <div class="alert alert-success alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% endwith %}
+                                        {%endif%}
+                                        
+                                        <form method="POST" action="UpdateProfile">
+                                            <div class="form-row">
+                                                <div class="col">
+                                                    <div class="form-group"><label for="firstname"><strong>Nama Depan</strong></label><input class="form-control" type="text" id="firstname" value="{{profile.firstname}}" name="firstname"></div>
+                                                </div>
+                                                <div class="col">
+                                                    {% if profile.lastname == None %}
+                                                    <div class="form-group"><label for="lastname"><strong>Nama Belakang</strong></label><input class="form-control" type="text" id="lastname" value="" name="lastname"></div>
+                                                    {% else %}
+                                                    <div class="form-group"><label for="lastname"><strong>Nama Belakang</strong></label><input class="form-control" type="text" id="lastname" value="{{profile.lastname}}" name="lastname"></div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col">
+                                                    <div class="form-group"><label for="password"><strong>Ganti Sandi</strong></label><input class="form-control" type="password" id="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" name="password"></div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group"><label for="password_repeat"><strong>Ulang Sandi</strong></label><input class="form-control" type="password" id="password_repeat" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" name="password_repeat"></div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="user-setting">Simpan</button></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card shadow">
+                                    <div class="card-header py-3">
+                                        <p class="text-primary m-0 font-weight-bold">Kontak</p>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if not flag %} 
+                                        {% with messages = get_flashed_messages(with_categories=true) %} 
+                                        {% if messages %} 
+                                            {% for category, message in messages %}
+                                                {% if category == 'error' %}
+                                            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% else %}
+                                            <div class="alert alert-success alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% endwith %}
+                                        {%endif%}
+                                        <form method="POST" action="./UpdateKontak">
+                                            {% if profile.address == None %}
+                                            <div class="form-group"><label for="address"><strong>Alamat Rumah</strong></label><input class="form-control" type="text" id="address" value=" " name="address"></div>
+                                            {% else %}
+                                            <div class="form-group"><label for="address"><strong>Alamat Rumah</strong></label><input class="form-control" type="text" id="address" value="{{profile.address}}" name="address"></div>
+                                            {% endif %}
+                                            {% if profile.phone == None %}
+                                            <div class="form-group"><label for="city"><strong>Nomor Telepon</strong></label><input class="form-control" type="text" id="no" value=" " name="phone"></div>
+                                            {% else %}
+                                            <div class="form-group"><label for="city"><strong>Nomor Telepon</strong></label><input class="form-control" type="text" id="no" value="{{profile.phone}}" name="phone"></div>
+                                            {% endif %}
+                                            <div class="form-group"><button class="btn btn-primary btn-sm" type="submit" name="btn" value="contact-setting">Simpan&nbsp;</button></div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- IMPORT LIB BOOTSTRAP 4, FONT AWESOME-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap/css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/fonts/fontawesome-all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap/css/bootstrap-datetimepicker.min.css')}}">
+    <!-- SCRIPT -->
+    <script src="{{ url_for('static', filename='assets/js/jquery.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='assets/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/js/moment.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/bootstrap/js/bootstrap-datetimepicker.min.js')}}"></script>
+
+    <!-- TITLE -->
+    <title>{% block title %} {% endblock %}</title>
+</head>
+<body class="bg-gradient-secondary">
+    {% if user.is_authenticated %} 
+    <div id="wrapper">
+        <!-- SIDEBAR -->
+        <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-dark p-0">
+            <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="{{ '/' }}">
+                    <div class="sidebar-brand-text mx-3"><span>Seminar IT</span></div>
+                </a>
+                <hr class="sidebar-divider my-0">
+                <ul class="navbar-nav text-light" id="accordionSidebar">
+                  <li class="nav-item"><a class="nav-link" href="{{ '/' }}"><i class="fas fa-table"></i><span>Dashboard</span></a></li>
+                  <li class="nav-item"><a class="nav-link" href="{{ '/profil' }}"><i class="fas fa-user"></i><span>Profile</span></a></li>
+                  {% if user.level == 1 %} 
+                  <li class="nav-item"><a class="nav-link" href="{{ '/user' }}"><i class="fas fa-users"></i><span>User Management</span></a></li>
+                  {% endif %}
+                </ul>
+                <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+            </div>
+        </nav>
+        <!-- TOP BAR -->
+        <div class="d-flex flex-column bg-secondary" id="content-wrapper">
+            <div id="content">
+                <nav class="navbar navbar-dark navbar-expand bg-dark shadow mb-4 topbar static-top">
+                    <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle mr-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                      <h3 style="color: white;">{{ page }}</h3>
+                        <ul class="navbar-nav flex-nowrap ml-auto">
+                            <div class="d-none d-sm-block topbar-divider"></div>
+                            <li class="nav-item dropdown no-arrow">
+                                <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#">
+                                  <span class="d-none d-lg-inline mr-2 text-gray-600 small"></span><img class="border rounded-circle img-profile" src="{{url_for('static', filename='assets/img/avatars/default.png')}}"></a>
+                                    <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in">
+                                      <div class="dropdown-item"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Hai, {{ user.username }} </div>
+                                      <div class="dropdown-item"><i class="fas fa-envelope fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;{{ user.email }} </div>
+                                        <div class="dropdown-divider"></div><a class="dropdown-item" href="{{ '/Logout' }}"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+                <!-- CONTENT -->
+                <div class="container-fluid">
+                    {% block Logged_Content %} {% endblock %} 
+                </div>
+            </div>
+            
+            
+    {% else %} 
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <!-- BUAT PENENGAH NAVIGASI -->
+        <div class="container">
+        <a class="navbar-brand" href="{{ '/' }}">Seminar IT</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+            <!-- NAVBAR ITEM. AKTIVE JIKA LINK DIBUKA -->
+            <li class="nav-item">
+                <a {% if page == 'Index' %}class="nav-link active"{% else %} class="nav-link" {%endif%} aria-current="page" href="{{ '/' }}">Home</a>
+            </li>
+            <li class="nav-item" {% if request.path == '/' %}class="active"{% endif %}>
+                <a {% if page == 'Auth' %}class="nav-link active"{% else %} class="nav-link" {%endif%} class="nav-link" href="{{ '/auth' }}">Login</a>
+            </li>
+            </ul>
+        </div>
+        </div>
+    </nav>
+    <div id="page-container">
+      <div id="content-wrap">
+        <div class="container">
+          {% block content %} {% endblock %}
+        </div>
+      </div>
+    
+    {% endif %}
+
+    <!-- FOOTER -->
+    {% if user.is_authenticated %} 
+        <footer class="bg-dark sticky-footer">
+          <div class="container my-auto">
+              <div class="text-center my-auto copyright"><span style="color: white;">Copyright © Seminar IT 2021</span></div>
+          </div>
+        </footer>
+    </div>
+    {% else %}
+    <footer class="footer bg-dark" id="footer">
+      <div class="container">
+          <div class="text-center my-auto copyright"><span style="color: white;">Copyright © Seminar IT 2021</span></div>
+      </div>
+    </footer>
+  </div>
+    {% endif %}
+
+    
+    {% block scriptadd %} {% endblock %}
+ </body>
+
+</html>

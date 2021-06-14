@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block title %} Dashboard {% endblock %}
+
+{% block Logged_Content %} 
+<div class="d-flex flex-column" id="content-wrapper">
+    <div class="container-fluid bg-secondary">
+        <div class="row mb-3">
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="card shadow mb-3">
+                            <div class="card-header py-3">
+                                <div class="row">
+                                    <div class="col"><h3 class="text-primary m-0 font-weight-bold">Daftar Event</h3></div>
+                                    <div class="col" style="text-align: right;">
+                                        {% if user.level == 1%}
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">Tambah</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                    {% with messages = get_flashed_messages(with_categories=true) %} 
+                                    {% if messages %} 
+                                        {% for category, message in messages %}
+                                            {% if category == 'error' %}
+                                            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% else %}
+                                            <div class="alert alert-success alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% endwith %}
+                                <table class="table table-hover table-borderless">
+                                    <thead>
+                                      <tr>
+                                        {% if user.level == 1%}
+                                        <th scope="col">ID</th>
+                                        {% endif %}
+                                        <th scope="col">Event</th>
+                                        <th scope="col">Pendaftaran Dibuka</th>
+                                        <th scope="col">Pendaftaran Terakhir</th>
+                                        <th scope="col">Detail Event</th>
+                                        <th scope="col">Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set x = user_event %}
+                                        {% for rows in events %}
+                                      <tr>
+                                        {% if user.level == 1%}
+                                            <td>{{ rows.id }}</td>
+                                        {% endif %}
+                                        <td>{{ rows.title }}</td>
+                                        <td>{{ rows.datestart }}</td>
+                                        <td>{{ rows.dateclose }}</td>
+                                        <td>{{ rows.detail }}</td>
+                                        <td>
+                                            {%if user.level == 1 %} 
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalHapus{{ rows.id }}">Hapus</button>
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEdit{{ rows.id }}">Edit</button>
+                                            {%else%}
+                                                {% if rows in x %}
+                                                <button type="button" class="btn btn-secondary" disabled>Mengikuti</button>
+                                                {%else%}
+                                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalGabung{{ rows.id }}">Gabung</button>
+                                                {%endif%}
+                                            {%endif%}
+                                        </td>
+                                      </tr>
+                                      {% endfor %}
+                                    </tbody>
+                                  </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Hapus-->
+{% for rows in events %}
+<div class="modal fade" id="modalHapus{{ rows.id }}" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Hapus Event</h4>
+            </div>
+            <form action="DeleteEvent" method="POST">
+                <div class="modal-body">
+                    <h5>Apakah anda ingin menghapus event?</h5>
+                    <input type="hidden" class="form-control" name="id" required="1" value="{{ rows.id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- Modal Edit-->
+{% for rows in events %}
+<div class="modal fade" id="modalEdit{{ rows.id }}" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Event</h4>
+            </div>
+            <form action="UpdateEvent" method="POST">
+            <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nama">Nama Event</label>
+                        <input type="text" class="form-control" name="event" required="1" value="{{ rows.title }}">
+                        <input type="hidden" class="form-control" name="id" required="1" value="{{ rows.id }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="dibuka">Pendaftaran Dibuka</label>
+                        <input type="text" class="form-control" name="dibuka" required="1" value="{{ rows.datestart }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Pendaftaran Terakhir</label>
+                        <input type="text" class="form-control" name="ditutup" required="1" value="{{ rows.dateclose }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Detail Event</label>
+                        <input type="text" class="form-control" name="detail" required="1" value="{{ rows.detail }}">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% for rows in events %}
+<!-- Modal Gabung-->
+<div class="modal fade" id="modalGabung{{ rows.id }}" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Gabung Event</h4>
+            </div>
+            <form action="GabungEvent" method="POST">
+                <div class="modal-body">
+                    <h5>Apakah anda ingin menghapus event?</h5>
+                    <input type="hidden" class="form-control" name="user_id" required="1" value="{{ user.id }}">
+                    <input type="hidden" class="form-control" name="event_id" required="1" value="{{ rows.id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">Ikuti</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- Modal Tambah-->
+<div class="modal fade" id="modalTambah" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tambah Event</h4>
+            </div>
+            <form action="{{ url_for('views.CreateEvent')}}" method="POST">
+                <div class="modal-body">
+                    
+                    <div class="form-group">
+                        <label for="nama">Nama Event</label>
+                        <input type="text" class="form-control" name="event" required="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="dibuka">Pendaftaran Dibuka</label>
+                        <div class="input-group mb-3"">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            <input type="text" class="form-control" name="dibuka" id="dibuka">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Pendaftaran Terakhir</label>
+                        <div class="input-group mb-3"">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            <input type="text" class="form-control" name="ditutup" id="ditutup">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Detail Event</label>
+                        <input type="text" class="form-control" name="detail" required="1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Tambah</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scriptadd %} 
+<script type="text/javascript">
+    $('#dibuka').datetimepicker()
+    $('#ditutup').datetimepicker()
+</script>
+
+{%endblock%}

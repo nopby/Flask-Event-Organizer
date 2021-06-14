@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %} User Management {% endblock %}
+
+{% block Logged_Content %} 
+<div class="d-flex flex-column" id="content-wrapper">
+    <div class="container-fluid bg-secondary">
+        <div class="row mb-3">
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col">
+                        <div class="card shadow mb-3">
+                            <div class="card-header py-3">
+                                <div class="row">
+                                    <div class="col"><h3 class="text-primary m-0 font-weight-bold">Daftar User</h3></div>
+                                    <div class="col" style="text-align: right;">
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambah">Tambah</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                    {% with messages = get_flashed_messages(with_categories=true) %} 
+                                    {% if messages %} 
+                                        {% for category, message in messages %}
+                                            {% if category == 'error' %}
+                                            <div class="alert alert-danger alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                                {% else %}
+                                            <div class="alert alert-success alert-dismissable fade show" role="alert">
+                                                    {{ message }} 
+                                                <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% endwith %}
+                                <table class="table table-hover table-borderless">
+                                    <thead>
+                                      <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Username</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Level</th>
+                                        <th scope="col">Created At</th>
+                                        <th scope="col">Online</th>
+                                        <th scope="col">Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for rows in users %}
+                                      <tr>
+                                        <td>{{ rows.id }}</td>
+                                        <td>{{ rows.username }}</td>
+                                        <td>{{ rows.email }}</td>
+                                        <td>{{ rows.level }}</td>
+                                        <td>{{ rows.created_at }}</td>
+                                        {% if rows.active %} 
+                                        <td><img src="{{ url_for('static', filename='assets/img/UserActive/active.png')}}" alt="active" style="width: 15px; height:15px ;"></td>
+                                        {% else %}
+                                        <td><img src="{{ url_for('static', filename='assets/img/UserActive/inactive.png')}}" alt="active" style="width: 15px; height:15px ;"></td>
+                                        {%endif%}
+                                        <td>
+                                            {% if user.level == 1 %} 
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalHapus{{ rows.id }}">Hapus</button>
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEdit{{ rows.id }}">Edit</button>
+                                            {%endif%}
+                                        </td>
+                                      </tr>
+                                      {% endfor %}
+                                    </tbody>
+                                  </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Hapus-->
+{% for rows in users %}
+<div class="modal fade" id="modalHapus{{ rows.id }}" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Hapus Event</h4>
+            </div>
+            <form action="DeleteUser" method="POST">
+                <div class="modal-body">
+                    <h5>Apakah anda ingin menghapus user?</h5>
+                    <input type="hidden" class="form-control" name="id" required="1" value="{{ rows.id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- Modal Edit-->
+{% for rows in users %}
+<div class="modal fade" id="modalEdit{{ rows.id }}" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit User</h4>
+            </div>
+            <form action="{{ url_for('views.UpdateUser') }}" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ditutup">Level</label>
+                    <div class="form-check">
+                        <input type="hidden" class="form-control" name="id" required="1" value="{{ rows.id }}">
+                        <input class="form-check-input" type="radio" name="level" value="1" id="level1" {% if rows.level == 1 %} checked {% endif %}>
+                        <label class="form-check-label mr-5" for="flexRadioDefault1">1</label>
+                        <input class="form-check-input" type="radio" name="level" id="level2" value="2" {% if rows.level == 2 %} checked {% endif %}>
+                        <label class="form-check-label" for="flexRadioDefault2">2</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal Tambah-->
+<div class="modal fade" id="modalTambah" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Tambah User</h4>
+            </div>
+            <form action="{{ url_for('views.CreateUser')}}" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nama">Username</label>
+                        <input type="text" class="form-control" name="username" required="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="dibuka">Email</label>
+                        <input type="text" class="form-control" name="email" required="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Password</label>
+                        <input type="password" class="form-control" name="password" required="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Repeat Password</label>
+                        <input type="password" class="form-control" name="password_repeat" required="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="ditutup">Level</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="level" value="1" id="level1">
+                            <label class="form-check-label mr-5" for="flexRadioDefault1">1</label>
+                            <input class="form-check-input" type="radio" name="level" id="level2" value="2" checked>
+                            <label class="form-check-label" for="flexRadioDefault2">2</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Tambah</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
